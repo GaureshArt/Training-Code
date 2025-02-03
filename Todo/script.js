@@ -3,28 +3,34 @@ document.addEventListener("DOMContentLoaded", () => {
   const buttonTodo = document.getElementById("button-todo");
   const ulTodo = document.getElementById("ul-todo");
   const buttonDeleteAll = document.querySelector('#button-delete-all');
+  
 
 
   let editMode = false;
   let editElement = null;
 
   buttonTodo.addEventListener("click", () => {
+    
     const text = inputTodo.value;
-    if (editMode) {
-      editElement.querySelector(".text-todo").textContent = text;
-      editMode = false;
-      editElement = null;
-      buttonTodo.textContent = "Add";
-    } else {
+    if(text.trim()){
       createTodo(text);
+      inputTodo.value = "";
+      saveAllTodo();
     }
-    inputTodo.value = "";
-    saveAllTodo();
   });
 
 
+  inputTodo.addEventListener('click',()=>{
+    if(editMode){
+      inputTodo.blur();
+      alert('Please complete initial todo task edit.')
+      return;
+    }
+  })
+
   //to delete all todos
   buttonDeleteAll.addEventListener('click',()=>{
+    
     if(confirm("are you sure? It will remove all todos.")){
       deleteAllTodos();
     }
@@ -48,19 +54,51 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   ulTodo.addEventListener("click", (e) => {
+    
     if (e.target.classList.contains("btn-warning")) {
-      e.target.closest(".list-group-item").remove();
-      saveAllTodo();
+      if(editMode){
+        alert('Please complete initial todo task edit.')
+        return;
+      }
+      if(confirm("Are you sure? It will delete todo task permanently.")){
+        e.target.closest(".list-group-item").remove();
+        saveAllTodo();
+      }
     }
-
+    const handleEditTodo = (e)=>{
+      
+      const editDiv = document.querySelector('.edit-div')
+      if(e.target.classList.contains('update')){
+        editElement.children[0].textContent = editDiv.children[0].value;
+        editDiv.replaceWith(editElement);
+        saveAllTodo();
+        editMode = false;
+      }
+      if(e.target.classList.contains('cancle')){
+        editDiv.replaceWith(editElement);
+        editMode = false;
+      }
+    }
     if (e.target.classList.contains("btn-danger")) {
+      if(editMode){
+        alert('Please complete initial todo task edit.')
+        return;
+      }
+
+      editMode = true;
       const li = e.target.closest(".list-group-item");
       const taskText = li.querySelector(".text-todo").textContent;
-      inputTodo.value = taskText;
-      buttonTodo.textContent = "Update";
-
+      const editDiv = document.createElement('div')
       editElement = li;
-      editMode = true;
+
+      editDiv.className = 'input-group edit-div'
+      editDiv.innerHTML = `<input type="text" class="form-control editInput" value="${taskText}"  >
+                          <button class="btn btn-outline-secondary update" type="button" id="update">Update</button>
+                          <button class="btn btn-outline-secondary cancle" type="button" id="cancle">Cancle</button>`;
+      li.replaceWith(editDiv)
+      editDiv.addEventListener('click',handleEditTodo)
+
+      
     }
   });
 
