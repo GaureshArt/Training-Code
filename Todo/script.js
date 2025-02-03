@@ -2,6 +2,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const inputTodo = document.getElementById("input-todo");
   const buttonTodo = document.getElementById("button-todo");
   const ulTodo = document.getElementById("ul-todo");
+  const buttonDeleteAll = document.querySelector('#button-delete-all');
+
 
   let editMode = false;
   let editElement = null;
@@ -19,6 +21,19 @@ document.addEventListener("DOMContentLoaded", () => {
     inputTodo.value = "";
     saveAllTodo();
   });
+
+
+  //to delete all todos
+  buttonDeleteAll.addEventListener('click',()=>{
+    if(confirm("are you sure? It will remove all todos.")){
+      deleteAllTodos();
+    }
+  })
+
+  const deleteAllTodos = ()=>{
+    ulTodo.innerHTML = '';
+    saveAllTodo();
+  }
 
   const createTodo = (task) => {
     const li = document.createElement("li");
@@ -41,7 +56,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.target.classList.contains("btn-danger")) {
       const li = e.target.closest(".list-group-item");
       const taskText = li.querySelector(".text-todo").textContent;
-
       inputTodo.value = taskText;
       buttonTodo.textContent = "Update";
 
